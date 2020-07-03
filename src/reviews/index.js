@@ -18,8 +18,8 @@ reviewsRouter.get("/", async (req, res, next) => {
 reviewsRouter.get("/:imdbID", async (req, res, next) => {
     try {
         const reviews = await readDB(reviewsJsonPath)
-        const currentreview = reviews.find(review => review.elementId === req.params.imdbID)
-        res.send(currentreview).status(200)        
+        const specificReviews = reviews.filter(review => review.elementId === req.params.imdbID)
+        res.send(specificReviews).status(200)        
     } catch (error) {
         next(error)
     }    
@@ -36,8 +36,7 @@ reviewsRouter.post("/",
             const error = new Error()
             error.httpStatusCode = 400
             error.message = error
-        }        
-    try {
+        }else try {
         const reviews = await readDB(reviewsJsonPath) 
         console.log("This is the body" + req.body)
         const newReview = {   

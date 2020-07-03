@@ -1,12 +1,11 @@
 const express = require("express")
 const { join } = require("path")
 const { readDB, writeDB } = require("../utilities")
+const { check, validationResult } = require("express-validator")
 
 const moviesJsonPath = join(__dirname, "movies.json")
 
 const mediaRouter = express.Router()
-
-
 
 mediaRouter.get("/", async (req, res, next) => {
     try {
@@ -30,7 +29,21 @@ mediaRouter.get("/:imdbID", async (req, res, next) => {
 })
 
 
-mediaRouter.post("/", async (req, res, next) => {
+mediaRouter.post("/",  
+  [
+    check("Title").exists().withMessage("You have to specifie a title!"),
+    check("Year").exists().withMessage("You have to specifie a Year!"),
+    check("imdbID").exists().withMessage("You have to specifie a imdbID!"),
+    check("Type").exists().withMessage("You have to specifie a Type!"),
+    check("Poster").exists().withMessage("You have to specifie a Poster!")
+  ],
+  async (req, res, next) => {
+    const error = validationResult(req)
+    if(!error.isEmpty()){
+      const error = new Error()
+      error.httpStatusCode = 400
+      error.message = error
+    }
       try {
         const movies = await readDB(moviesJsonPath)
         const imdbIDCheck = movies.find((x) => x.imdbID === req.body.imdbID)
